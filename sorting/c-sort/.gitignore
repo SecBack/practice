@@ -4,3 +4,6 @@
 *.lss
 *.map
 *.sym
+../.vscode
+../.idea
+/build

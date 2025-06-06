@@ -3,125 +3,222 @@
 #include <stdlib.h>
 #include "sort.h"
 
-// given an array, fill with random numbers until the length is equal
-// to size, each number will not be bigger than upper bound
-void generateRandomNumbers(int* array, int size, int upperBound) {
-    srand(time(NULL));
+/**
+ * @brief given an array, fill with random numbers until the length is equal
+ * to size, each number will not be bigger than upper bound
+ * 
+ * @param array array to fill
+ * @param size size of the array
+ * @param upper_bound max generated number
+ */
+void generate_random_numbers(int* array, int size, int upper_bound) {
+    srand((unsigned int)time(NULL));
     for (int i = 0; i < size; i++) {
-        array[i] = rand() % upperBound + 1;
+        array[i] = rand() % upper_bound + 1;
     }
 }
 
-// tests my single threaded merge sort implementation
-void testSingleThread() {
+/**
+ * @brief tests my single threaded merge sort implementation
+ * 
+ */
+void test_single_thread(void) {
     printf("single threaded:\n");
 
-    const int size1 = 1000;
-    const int size2 = 2000;
-    const int size3 = 5000;
-    const int size4 = 50000;
-    const int size5 = 1000000;
-    int numbers1[size1];
-    int numbers2[size2];
-    int numbers3[size3];
-    int numbers4[size4];
-    int numbers5[size5];
-    generateRandomNumbers(numbers1, size1, 1000);
-    generateRandomNumbers(numbers2, size2, 2000);
-    generateRandomNumbers(numbers3, size3, 5000);
-    generateRandomNumbers(numbers4, size4, 50000);
-    generateRandomNumbers(numbers5, size5, 1000000);
+    const int size1 = 1;
+    const int size2 = 10;
+    const int size3 = 100;
+    const int size4 = 1000;
+    const int size5 = 10000000;
+    int* numbers1 = (int*)malloc(size1 * sizeof(int));
+    int* numbers2 = (int*)malloc(size2 * sizeof(int));
+    int* numbers3 = (int*)malloc(size3 * sizeof(int));
+    int* numbers4 = (int*)malloc(size4 * sizeof(int));
+    int* numbers5 = (int*)malloc(size5 * sizeof(int));
+    generate_random_numbers(numbers1, size1, 1000);
+    generate_random_numbers(numbers2, size2, 2000);
+    generate_random_numbers(numbers3, size3, 5000);
+    generate_random_numbers(numbers4, size4, 50000);
+    generate_random_numbers(numbers5, size5, 1000000);
 
     // Measure time for sorting numbers1
     clock_t start = clock();
-    mergeSort(numbers1, 0, size1 - 1);
+    merge_sort(numbers1, 0, size1 - 1);
     clock_t end = clock();
-    double timeTaken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d numbers: %.6f seconds\n", size1, timeTaken);
+    double time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size1, time_taken);
 
     // Measure time for sorting numbers1
     start = clock();
-    mergeSort(numbers2, 0, size2 - 1);
+    merge_sort(numbers2, 0, size2 - 1);
     end = clock();
-    timeTaken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d numbers: %.6f seconds\n", size2, timeTaken);
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size2, time_taken);
 
     // Measure time for sorting numbers1
     start = clock();
-    mergeSort(numbers3, 0, size3 - 1);
+    merge_sort(numbers3, 0, size3 - 1);
     end = clock();
-    timeTaken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d numbers: %.6f seconds\n", size3, timeTaken);
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size3, time_taken);
 
     // Measure time for sorting numbers1
     start = clock();
-    mergeSort(numbers4, 0, size4 - 1);
+    merge_sort(numbers4, 0, size4 - 1);
     end = clock();
-    timeTaken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d numbers: %.6f seconds\n", size4, timeTaken);
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size4, time_taken);
 
     // Measure time for sorting numbers1
     start = clock();
-    mergeSort(numbers5, 0, size5 - 1);
+    merge_sort(numbers5, 0, size5 - 1);
     end = clock();
-    timeTaken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d numbers: %.6f seconds\n", size5, timeTaken);
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size5, time_taken);
 
     printf("\n");
+
+    free(numbers1);
+    free(numbers2);
+    free(numbers3);
+    free(numbers4);
+    free(numbers5);
 }
 
-// tests my multi threaded merge sort implementation
-void testMultiThread() {
+/**
+ * @brief tests my multi threaded merge sort implementation
+ * 
+ */
+void test_multi_thread(void) {
     printf("multi threaded:\n");
 
-    const int size1 = 1000;
-    const int size2 = 2000;
-    const int size3 = 5000;
-    const int size4 = 50000;
-    const int size5 = 1000000;
-    int numbers1[size1];
-    int numbers2[size2];
-    int numbers3[size3];
-    int numbers4[size4];
-    int numbers5[size5];
-    generateRandomNumbers(numbers1, size1, 1000);
-    generateRandomNumbers(numbers2, size2, 2000);
-    generateRandomNumbers(numbers3, size3, 5000);
-    generateRandomNumbers(numbers4, size4, 50000);
-    generateRandomNumbers(numbers5, size5, 1000000);
+    const int size1 = 1;
+    const int size2 = 10;
+    const int size3 = 100;
+    const int size4 = 1000;
+    const int size5 = 10000000;
+    int* numbers1 = (int*)malloc(size1 * sizeof(int));
+    int* numbers2 = (int*)malloc(size2 * sizeof(int));
+    int* numbers3 = (int*)malloc(size3 * sizeof(int));
+    int* numbers4 = (int*)malloc(size4 * sizeof(int));
+    int* numbers5 = (int*)malloc(size5 * sizeof(int));
+    generate_random_numbers(numbers1, size1, 100);
+    generate_random_numbers(numbers2, size2, 100);
+    generate_random_numbers(numbers3, size3, 100);
+    generate_random_numbers(numbers4, size4, 100);
+    generate_random_numbers(numbers5, size5, 100);
 
     // Measure time for sorting numbers1
     clock_t start = clock();
-    multiMergeSort(numbers1, 0, size1 - 1);
+    multi_merge_sort(numbers1, 0, size1 - 1);
     clock_t end = clock();
-    double timeTaken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d numbers: %.6f seconds\n", size1, timeTaken);
+    double time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size1, time_taken);
 
     // Measure time for sorting numbers1
     start = clock();
-    multiMergeSort(numbers2, 0, size2 - 1);
+    multi_merge_sort(numbers2, 0, size2 - 1);
     end = clock();
-    timeTaken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d numbers: %.6f seconds\n", size2, timeTaken);
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size2, time_taken);
 
     // Measure time for sorting numbers1
     start = clock();
-    multiMergeSort(numbers3, 0, size3 - 1);
+    multi_merge_sort(numbers3, 0, size3 - 1);
     end = clock();
-    timeTaken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d numbers: %.6f seconds\n", size3, timeTaken);
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size3, time_taken);
 
     // Measure time for sorting numbers1
     start = clock();
-    multiMergeSort(numbers4, 0, size4 - 1);
+    multi_merge_sort(numbers4, 0, size4 - 1);
     end = clock();
-    timeTaken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d numbers: %.6f seconds\n", size4, timeTaken);
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size4, time_taken);
 
     // Measure time for sorting numbers1
     start = clock();
-    multiMergeSort(numbers5, 0, size5 - 1);
+    multi_merge_sort(numbers5, 0, size5 - 1);
     end = clock();
-    timeTaken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d numbers: %.6f seconds\n", size5, timeTaken);
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size5, time_taken);
+
+    printf("\n");
+
+    free(numbers1);
+    free(numbers2);
+    free(numbers3);
+    free(numbers4);
+    free(numbers5);
+}
+
+/**
+ * @brief tests my multi threaded merge sort implementation
+ * 
+ */
+void test_threadpool_merge_sort(void) {
+    printf("threadpool:\n");
+
+    const int size1 = 4;
+    const int size2 = 10;
+    const int size3 = 100;
+    const int size4 = 1000;
+    const int size5 = 10000000;
+    int* numbers1 = (int*)malloc(size1 * sizeof(int));
+    int* numbers2 = (int*)malloc(size2 * sizeof(int));
+    int* numbers3 = (int*)malloc(size3 * sizeof(int));
+    int* numbers4 = (int*)malloc(size4 * sizeof(int));
+    int* numbers5 = (int*)malloc(size5 * sizeof(int));
+    generate_random_numbers(numbers1, size1, 100);
+    generate_random_numbers(numbers2, size2, 100);
+    generate_random_numbers(numbers3, size3, 100);
+    generate_random_numbers(numbers4, size4, 100);
+    generate_random_numbers(numbers5, size5, 100);
+
+    // Measure time for sorting numbers1
+    clock_t start = clock();
+    threadpool_merge_sort(numbers1, size1);
+    clock_t end = clock();
+    double time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size1, time_taken);
+
+    // Measure time for sorting numbers1
+    start = clock();
+    threadpool_merge_sort(numbers2, size2);
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size2, time_taken);
+
+    // Measure time for sorting numbers1
+    start = clock();
+    threadpool_merge_sort(numbers3, size3);
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size3, time_taken);
+
+    for (int i = 0; i < size3; i++)
+    {
+        printf("%d\n", numbers3[i]);
+    }
+    
+
+    // Measure time for sorting numbers1
+    start = clock();
+    threadpool_merge_sort(numbers4, size4);
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size4, time_taken);
+
+    // Measure time for sorting numbers1
+    start = clock();
+    threadpool_merge_sort(numbers5, size5);
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d numbers: %.6f seconds\n", size5, time_taken);
+
+    free(numbers1);
+    free(numbers2);
+    free(numbers3);
+    free(numbers4);
+    free(numbers5);
 }
