@@ -196,13 +196,7 @@ void test_threadpool_merge_sort(void) {
     time_taken = (double)(end - start) / CLOCKS_PER_SEC;
     printf("Time taken to sort %d numbers: %.6f seconds\n", size3, time_taken);
 
-    for (int i = 0; i < size3; i++)
-    {
-        printf("%d\n", numbers3[i]);
-    }
-    
-
-    // Measure time for sorting numbers1
+    // // Measure time for sorting numbers1
     start = clock();
     threadpool_merge_sort(numbers4, size4);
     end = clock();

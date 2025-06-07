@@ -33,9 +33,10 @@ threadpool_t *threadpool_create(int thread_count, int queue_size) {
     pool->threads = (pthread_t*)malloc(thread_count * sizeof(pthread_t));
     pool->queue = (threadpool_task_t*)malloc(queue_size * sizeof(threadpool_task_t));
 
-    // 
+    // init conditions and mutexes
     pthread_mutex_init(&(pool->lock), NULL);
     pthread_cond_init(&(pool->notify), NULL);
+    pthread_cond_init(&(pool->empty), NULL);
 
     // create the threads
     for (int i = 0; i < thread_count; i++) {
@@ -64,7 +65,7 @@ int threadpool_add(threadpool_t *pool, void (*function)(void *), void *argument)
     // lock the queue while we're working with it
     pthread_mutex_lock(&(pool->lock));
 
-    // incrementing the pool size, terminate if max queue is reached
+    // incrementing the queue size, terminate if max queue is reached
     // modulus wrap around 
     next = (pool->tail + 1) % pool->queue_size;
     if (pool->count == pool->queue_size) {
@@ -112,6 +113,7 @@ int threadpool_destroy(threadpool_t *pool) {
     // destroy the mutex and condition variables
     pthread_mutex_destroy(&(pool->lock));
     pthread_cond_destroy(&(pool->notify));
+    pthread_cond_destroy(&(pool->empty));
 
     // free up the allocated memory
     free(pool->threads);
@@ -156,10 +158,31 @@ static void *threadpool_thread(void *threadpool) {
         task.argument = pool->queue[pool->head].argument;
         pool->head = (pool->head + 1) % pool->queue_size;
         pool->count -= 1;
+        
+        // signal that the queue is empty for the wait funciton
+        if (pool->count == 0) {
+            pthread_cond_signal(&(pool->empty));
+        }
 
         // unlock the mutex and execute the work of the task
         pthread_mutex_unlock(&(pool->lock));
         // this calls the function with the arguments, programatically
         (*(task.fucntion))(task.argument);
     }
+}
+
+/**
+ * @brief wait for the workers to empty the pool. conditionally waits for
+ * the empty signal
+ * 
+ * @param pool 
+ */
+void threadpool_wait(threadpool_t *pool) {
+    // lock the pool while we check the count
+    pthread_mutex_lock(&(pool->lock));
+    while (pool->count > 0) {
+        // wait for the empty signal
+        pthread_cond_wait(&(pool->empty), &(pool->lock));
+    }
+    pthread_mutex_unlock(&(pool->lock));
 }
