@@ -15,6 +15,18 @@ void merge_wrapper(void* merge_args) {
 }
 
 /**
+ * @brief wrapper is needed to pass db merge to the threadpool
+ * 
+ * @param args 
+ * @return void* 
+ */
+void db_merge_wrapper(void* db_merge_args) {
+    struct db_merge_args* args = (struct db_merge_args*)db_merge_args;
+    db_merge(args->source, args->destination, args->left, args->mid, args->right);
+    free(args);
+}
+
+/**
  * @brief wrapper is needed to pass merge_sort to the p_thread api
  * 
  * @param args 

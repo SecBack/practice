@@ -96,7 +96,7 @@ void test_multi_thread(void) {
     const int size2 = 10;
     const int size3 = 100;
     const int size4 = 1000;
-    const int size5 = 10000000;
+    const int size5 = 250000000;
     int* numbers1 = (int*)malloc(size1 * sizeof(int));
     int* numbers2 = (int*)malloc(size2 * sizeof(int));
     int* numbers3 = (int*)malloc(size3 * sizeof(int));
@@ -163,7 +163,7 @@ void test_threadpool_merge_sort(void) {
     const int size2 = 10;
     const int size3 = 100;
     const int size4 = 1000;
-    const int size5 = 10000000;
+    const int size5 = 25000000;
     int* numbers1 = (int*)malloc(size1 * sizeof(int));
     int* numbers2 = (int*)malloc(size2 * sizeof(int));
     int* numbers3 = (int*)malloc(size3 * sizeof(int));

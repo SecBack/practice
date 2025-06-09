@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
+#include <string.h>
 #include "sort.h"
 #include "helper.h"
 #include "./../../threadpool/threadpool.h"
@@ -61,8 +62,7 @@ void merge(int* array, int left, int mid, int right) {
 
 /**
  * @brief double buffering. instead of overwriting the same array all the time
- * we "ping pong" between 2 arrays. this can also help the threadpool with
- * having to sync less
+ * we "ping pong" between 2 arrays
  * 
  * @param a ping
  * @param b pong
@@ -70,15 +70,15 @@ void merge(int* array, int left, int mid, int right) {
  * @param mid index of last element in left array
  * @param right index of last element in right array
  */
-void db_merge(int* a, int* b, int left, int mid, int right) {
+void db_merge(int* source, int* destination, int left, int mid, int right) {
     int i = left, j = mid + 1, k = left;
     
     while (i <= mid && j <= right) {
-        if (a[i] <= a[j]) b[k++] = a[i++];
-        else b[k++] = a[j++];
+        if (source[i] <= source[j]) destination[k++] = source[i++];
+        else destination[k++] = source[j++];
     }
-    while (i <= mid) b[k++] = a[i++];
-    while (j <= right) b[k++] = a[j++];
+    while (i <= mid) destination[k++] = source[i++];
+    while (j <= right) destination[k++] = source[j++];
 }
 
 /**
@@ -141,6 +141,9 @@ void multi_merge_sort(int* array, int left, int right) {
  */
 void threadpool_merge_sort(int* array, int size) {
     threadpool_t* pool = threadpool_create(MAX_THREADS, MAX_QUEUE);
+    int* aux = malloc(size * sizeof(int));
+    int* source = array;
+    int* destination = aux;
 
     for (int sub_size = 1; sub_size < size; sub_size *= 2) {
         for (int sub_index = 0; sub_index < size - sub_size; sub_index += 2*sub_size) {
@@ -152,17 +155,26 @@ void threadpool_merge_sort(int* array, int size) {
             if (sub_size < 1000000) {
                 merge(array, left, mid, right);
             } else {
-                struct merge_args *merge_args = (struct merge_args *)malloc(sizeof(struct merge_args));
-                merge_args->array = array;
-                merge_args->left = left;
-                merge_args->mid = mid;
-                merge_args->right = right;
-                threadpool_add(pool, merge_wrapper, merge_args);
+                struct db_merge_args *db_merge_args = (struct db_merge_args *)malloc(sizeof(struct merge_args));
+                db_merge_args->source = array;
+                db_merge_args->destination = destination;
+                db_merge_args->left = left;
+                db_merge_args->mid = mid;
+                db_merge_args->right = right;
+                threadpool_add(pool, db_merge_wrapper, db_merge_args);
             }
 
         }
         threadpool_wait(pool);
+        // Swap src and dest for next layer
+        int* tmp = source; source = destination; destination = tmp;
     }
+
+    // If the sorted data is not in the original array, copy it back
+    if (source != array) {
+        memcpy(array, aux, size * sizeof(int));
+    }
+    free(aux);
 
     // clean up
     threadpool_destroy(pool);
